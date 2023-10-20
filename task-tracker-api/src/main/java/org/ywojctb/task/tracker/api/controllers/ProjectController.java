@@ -5,10 +5,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
+import org.ywojctb.task.tracker.api.controllers.helpers.ControllerHelper;
 import org.ywojctb.task.tracker.api.dto.AskDto;
 import org.ywojctb.task.tracker.api.dto.ProjectDto;
 import org.ywojctb.task.tracker.api.exceptions.BadRequestException;
-import org.ywojctb.task.tracker.api.exceptions.NotFoundException;
 import org.ywojctb.task.tracker.api.factories.ProjectDtoFactory;
 import org.ywojctb.task.tracker.store.entities.ProjectEntity;
 import org.ywojctb.task.tracker.store.repositories.ProjectRepository;
@@ -30,10 +30,11 @@ public class ProjectController {
 
     ProjectDtoFactory projectDtoFactory;
 
+    ControllerHelper controllerHelper;
 
     public static final String FETCH_PROJECTS = "/api/projects";
-    public static final String CREATE_PROJECTS = "/api/projects";
-    public static final String EDIT_PROJECTS = "/api/projects/{project_id}";
+    //public static final String CREATE_PROJECTS = "/api/projects";
+    //public static final String EDIT_PROJECTS = "/api/projects/{project_id}";
     public static final String DELETE_PROJECTS = "/api/projects/{project_id}";
     public static final String CREATE_OR_UPDATE_PROJECT = "/api/projects";
 
@@ -56,16 +57,16 @@ public class ProjectController {
             @RequestParam(value = "project_id", required = false) Optional<Long> optionalProjectId,
             @RequestParam(value = "project_name", required = false) Optional<String> optionalProjectName) {
 
-        optionalProjectName = optionalProjectName.filter(String::isEmpty);
+        optionalProjectName = optionalProjectName.filter(projectName -> !projectName.trim().isEmpty());
 
-        boolean isCreate = optionalProjectId.isEmpty();
+        boolean isCreate = !optionalProjectId.isPresent();
 
-        if (isCreate && optionalProjectName.isPresent()) {
-            throw new BadRequestException("Project name can't be empty. ");
+        if (isCreate && !optionalProjectName.isPresent()) {
+            throw new BadRequestException("Project name can't be empty.");
         }
 
         final ProjectEntity project = optionalProjectId
-                .map(this::getProjectOrThrowException)
+                .map(controllerHelper::getProjectOrThrowException)
                 .orElseGet(() -> ProjectEntity.builder().build());
 
         optionalProjectName
@@ -75,17 +76,19 @@ public class ProjectController {
                             .findByName(projectName)
                             .filter(anotherProject -> !Objects.equals(anotherProject.getId(), project.getId()))
                             .ifPresent(anotherProject -> {
-                                throw new BadRequestException(String.format("Project \"%s\" already exists.", projectName));
+                                throw new BadRequestException(
+                                        String.format("Project \"%s\" already exists.", projectName)
+                                );
                             });
 
                     project.setName(projectName);
-
                 });
 
         final ProjectEntity savedProject = projectRepository.saveAndFlush(project);
 
         return projectDtoFactory.makeProjectDto(savedProject);
     }
+
 
 /*
     @PostMapping(CREATE_PROJECTS)
@@ -140,21 +143,11 @@ public class ProjectController {
 
     @DeleteMapping(DELETE_PROJECTS)
     public AskDto deleteProject(@PathVariable("project_id") Long projectId) {
-
-        getProjectOrThrowException(projectId);
+        controllerHelper.getProjectOrThrowException(projectId);
 
         projectRepository.deleteById(projectId);
 
         return AskDto.makeDefault(true);
-    }
-
-    private ProjectEntity getProjectOrThrowException(Long projectId) {
-        return projectRepository
-                .findById(projectId)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format(
-                                "Project with \"%s\" doesn't exist. ",
-                                projectId)));
     }
 
 }
