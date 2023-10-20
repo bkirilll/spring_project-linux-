@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import org.ywojctb.task.tracker.api.controllers.helpers.ControllerHelper;
+import org.ywojctb.task.tracker.api.dto.AskDto;
 import org.ywojctb.task.tracker.api.dto.TaskStateDto;
 import org.ywojctb.task.tracker.api.exceptions.BadRequestException;
 import org.ywojctb.task.tracker.api.exceptions.NotFoundException;
@@ -36,7 +37,7 @@ public class TaskStateController {
     public static final String CREATE_TASK_STATE = "/api/projects/{project_id}/task_states";
     public static final String UPDATE_TASK_STATE = "/api/task-states/{task_state_id}";
     public static final String CHANGE_TASK_STATE_POSITION = "/api/task-states/{task_state_id}/position/change";
-
+    public static final String DELETE_TASK_STATE = "/api/task-states/{task_state_id}";
 
     @GetMapping(GET_TASK_STATES)
     public List<TaskStateDto> getTaskStates(@PathVariable(name = "project_id") Long projectId) {
@@ -211,6 +212,18 @@ public class TaskStateController {
         return taskStateDtoFactory.makeTaskStateDto(changeTaskState);
     }
 
+    @DeleteMapping(DELETE_TASK_STATE)
+    public AskDto deleteTaskState(@PathVariable(name = "task_state_id") Long taskStateId) {
+
+        TaskStateEntity changeTaskState = getTaskStateOrThrowException(taskStateId);
+
+        replaceOldTaskStatePosition(changeTaskState);
+
+        taskStateRepository.delete(changeTaskState);
+
+        return AskDto.builder().answer(true).build();
+    }
+
     private void replaceOldTaskStatePosition(TaskStateEntity changeTaskState) {
 
         Optional<TaskStateEntity> optionalOldLeftTaskState = changeTaskState.getLeftTaskState();
@@ -232,7 +245,6 @@ public class TaskStateController {
                     taskStateRepository.saveAndFlush(it);
                 });
     }
-
 
     private TaskStateEntity getTaskStateOrThrowException(Long taskStateId) {
         return taskStateRepository
