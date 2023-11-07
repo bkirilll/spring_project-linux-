@@ -1,5 +1,8 @@
 package ru.ywojctb.config;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class MySpringMvcDispatcherServletInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
@@ -19,4 +22,6 @@ public class MySpringMvcDispatcherServletInitializer extends AbstractAnnotationC
     protected String[] getServletMappings() {
         return new String[] {"/"};
     }
+
+
 }

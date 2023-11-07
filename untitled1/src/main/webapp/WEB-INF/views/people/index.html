@@ -6,13 +6,15 @@
 </head>
 <body>
 
-<div th:each="person : ${people}">
-    <a th:href="@{/people/{id}(id=${person.getId()})}" th:text="${person.getName()}">user</a>
-</div>
 
 <div th:each="person : ${people}">
     <a th:href="@{/people/{id}(id=${person.getId()})}" th:text="${person.getName()}">user</a>
 </div>
+
+<br>
+<hr/>
+
+<a href="/untilted1_war_exploded/people/new">Create new person</a>
 
 
 </body>
