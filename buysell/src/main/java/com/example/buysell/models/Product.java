@@ -1,13 +1,12 @@
 package com.example.buysell.models;
 
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
