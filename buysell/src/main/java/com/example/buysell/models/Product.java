@@ -2,6 +2,7 @@ package com.example.buysell.models;
 
 
 import javax.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,12 +38,12 @@ public class Product {
     @Column(name = "city")
     String city;
 
-    @Column(name = "author")
-    String author;
-
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "product")
     List<Image> images = new ArrayList<>();
 
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @JoinColumn
+    User user;
 
     Long previewImageId;
 
