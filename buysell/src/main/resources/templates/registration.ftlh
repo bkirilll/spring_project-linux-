@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>BUYSELL</title>
+    <title>Registration</title>
 </head>
 <body>
 <h1>BUYSELL</h1>

@@ -1,7 +1,9 @@
 package com.example.buysell.models;
 
 import com.example.buysell.models.enums.Role;
+
 import javax.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -57,6 +59,10 @@ public class User implements UserDetails {
 
 
     //Security
+
+    public boolean isAdmin() {
+        return roles.contains(Role.ROLE_ADMIN);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
